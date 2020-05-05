@@ -50,7 +50,7 @@ Folder Structure:
 
 	.
 	├── Data_folder                   
-	|   ├── train_set              # i.e. brucewayne2batman
+	|   ├── train_set              
 	|   |   ├── data_1             # Training
 	|   |   |   ├── A              # Contains domain A images 
 	|   |   |   └── B              # Contains domain B labels 
