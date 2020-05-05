@@ -48,29 +48,29 @@ visdom>=0.1.8.
 Modify the init.py to set the parameters and start the training/testing on the data:
 Folder Structure:
 
-.
-├── Data_folder                   
-|   ├── train_set              # i.e. brucewayne2batman
-|   |   ├── data_1             # Training
-|   |   |   ├── A              # Contains domain A images 
-|   |   |   └── B              # Contains domain B labels 
-|   |   └── data_2             
-|   |   |   ├── A              
-|   |   |   └── B              
-|   ├── test_set               
-|   |   ├── data_1             # Testing
-|   |   |   ├── A              
-|   |   |   └── B              
-|   |   └── data_2             
-|   |   |   ├── A              
-|   |   |   └── B              
-|   ├── validation_set               
-|   |   ├── data_1             # Validation
-|   |   |   ├── A             
-|   |   |   └── B              
-|   |   └── data_2             
-|   |   |   ├── A              
-|   |   |   └── B              
+	.
+	├── Data_folder                   
+	|   ├── train_set              # i.e. brucewayne2batman
+	|   |   ├── data_1             # Training
+	|   |   |   ├── A              # Contains domain A images 
+	|   |   |   └── B              # Contains domain B labels 
+	|   |   └── data_2             
+	|   |   |   ├── A              
+	|   |   |   └── B              
+	|   ├── test_set               
+	|   |   ├── data_1             # Testing
+	|   |   |   ├── A              
+	|   |   |   └── B              
+	|   |   └── data_2             
+	|   |   |   ├── A              
+	|   |   |   └── B              
+	|   ├── validation_set               
+	|   |   ├── data_1             # Validation
+	|   |   |   ├── A             
+	|   |   |   └── B              
+	|   |   └── data_2             
+	|   |   |   ├── A              
+	|   |   |   └── B              
 
 ## Features
 - 3D data processing ready
