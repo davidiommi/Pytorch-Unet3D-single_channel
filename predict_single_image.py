@@ -193,7 +193,7 @@ def inference(write_image, model, image_path, label_path, result_path, resample,
     label_np = (np.float32(label_np) / np.float32(weight_np) + 0.01)
 
     if segmentation is True:
-        label_np = np.around(label_np)
+        label_np = abs(np.around(label_np))
 
     # removed the 1 pad on z
     if Padding is True:
