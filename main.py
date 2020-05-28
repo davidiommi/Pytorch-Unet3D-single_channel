@@ -70,10 +70,10 @@ def main(args):
 
         trainTransforms = [
             NiftiDataset.Resample(args.new_resolution, args.resample),
+            NiftiDataset.Augmentation(),
             NiftiDataset.Padding((args.patch_size[0], args.patch_size[1], args.patch_size[2])),
             NiftiDataset.RandomCrop((args.patch_size[0], args.patch_size[1], args.patch_size[2]), args.drop_ratio,
                                     min_pixel),
-            NiftiDataset.Augmentation(),
         ]
 
         valTransforms = [
