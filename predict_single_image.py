@@ -8,13 +8,14 @@ import argparse
 import matplotlib.pyplot as plt
 import math
 import scipy
-import UNet
+from UNet import UNet
 import torch
 from utils import *
 from torch.autograd import Variable
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--gpu_id', default=0, help='Select the GPU')
+parser.add_argument('--multi_gpu', default=False, help='Multi or single Gpu')
+parser.add_argument('--gpu_id', default='0', help='Select the GPU')
 parser.add_argument("--image", type=str, default='./Data_folder/carotid/train_set/data_1/image.nii')
 parser.add_argument("--label", type=str, default='./Data_folder/carotid/train_set/data_1/label.nii')
 parser.add_argument("--result", type=str, default='./prova.nii', help='path to the .nii result to save')
@@ -69,12 +70,7 @@ def inference(write_image, model, image_path, label_path, result_path, resample,
     image = reader.Execute()
 
     # normalize the image
-    normalizeFilter = sitk.NormalizeImageFilter()
-    resacleFilter = sitk.RescaleIntensityImageFilter()
-    resacleFilter.SetOutputMaximum(255)
-    resacleFilter.SetOutputMinimum(0)
-    image = normalizeFilter.Execute(image)  # set mean and std deviation
-    image = resacleFilter.Execute(image)
+    image = Normalization(image)
 
     castImageFilter = sitk.CastImageFilter()
     castImageFilter.SetOutputPixelType(sitk.sitkFloat32)
@@ -214,7 +210,7 @@ def inference(write_image, model, image_path, label_path, result_path, resample,
         print("{}: Resampling label back to original image space...".format(datetime.datetime.now()))
         # label = resample_sitk_image(label, spacing=image.GetSpacing(), interpolator='bspline')   # keep this commented
         if segmentation is True:
-            label = resize(label, (sitk.GetArrayFromImage(image)).shape[::-1], sitk.sitkNearestNeighbor)
+            label = resize(label, (sitk.GetArrayFromImage(image)).shape[::-1], sitk.sitkBSpline)
             label_array = np.around(sitk.GetArrayFromImage(label))
             label = sitk.GetImageFromArray(label_array)
             label.SetDirection(image.GetDirection())
@@ -259,8 +255,14 @@ def inference(write_image, model, image_path, label_path, result_path, resample,
 
 if __name__ == "__main__":
 
-    torch.cuda.set_device(args.gpu_id)
-    net = UNet.UNet().cuda()
+    if args.multi_gpu is True:
+        os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id  # Multi-gpu selector for training
+        net = torch.nn.DataParallel((UNet(residual='pool')).cuda())  # load the network Unet
+
+    else:
+        torch.cuda.set_device(args.gpu_id)
+        net = UNet(residual='pool').cuda()
+
     net.load_state_dict(torch.load(args.weights))
 
     result, dice = inference(True, net, args.image, None, args.result, args.resample, args.new_resolution,

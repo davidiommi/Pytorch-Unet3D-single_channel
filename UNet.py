@@ -18,10 +18,10 @@ class UNet(Module):
         super(UNet, self).__init__()
 
         # Encoder downsamplers
-        self.pool1 = MaxPool3d((1, 2, 2))
-        self.pool2 = MaxPool3d((1, 2, 2))
-        self.pool3 = MaxPool3d((1, 2, 2))
-        self.pool4 = MaxPool3d((1, 2, 2))
+        self.pool1 = MaxPool3d((2, 2, 2))
+        self.pool2 = MaxPool3d((2, 2, 2))
+        self.pool3 = MaxPool3d((2, 2, 2))
+        self.pool4 = MaxPool3d((2, 2, 2))
 
         # Encoder convolutions
         self.conv_blk1 = Conv3D_Block(num_channels, feat_channels[0], residual=residual)
@@ -119,12 +119,12 @@ class Conv3D_Block(Module):
 
 class Deconv3D_Block(Module):
 
-    def __init__(self, inp_feat, out_feat, kernel=4, stride=2, padding=1):
+    def __init__(self, inp_feat, out_feat, kernel=3, stride=2, padding=1):
         super(Deconv3D_Block, self).__init__()
 
         self.deconv = Sequential(
-            ConvTranspose3d(inp_feat, out_feat, kernel_size=(1, kernel, kernel),
-                            stride=(1, stride, stride), padding=(0, padding, padding), output_padding=0, bias=True),
+            ConvTranspose3d(inp_feat, out_feat, kernel_size=(kernel, kernel, kernel),
+                            stride=(stride, stride, stride), padding=(padding, padding, padding), output_padding=1, bias=True),
             ReLU())
 
     def forward(self, x):
@@ -149,14 +149,14 @@ if __name__ == '__main__':
     import time
     import torch
     from torch.autograd import Variable
-    import torchsummary
+    from torchsummaryX import summary
 
     torch.cuda.set_device(0)
     net =UNet(residual='pool').cuda().eval()
 
-    data = Variable(torch.randn(1, 1, 64, 64, 64)).cuda()
-    start_time = time.time()
-    print("go")
-    for _ in range(500):
-        _ = net(data)
-    print((time.time() - start_time) / 500)
+    data = Variable(torch.randn(1, 1, 256, 256, 16)).cuda()
+
+    out = net(data)
+
+    summary(net,data)
+    print("out size: {}".format(out.size()))
