@@ -210,7 +210,7 @@ def inference(write_image, model, image_path, label_path, result_path, resample,
         print("{}: Resampling label back to original image space...".format(datetime.datetime.now()))
         # label = resample_sitk_image(label, spacing=image.GetSpacing(), interpolator='bspline')   # keep this commented
         if segmentation is True:
-            label = resize(label, (sitk.GetArrayFromImage(image)).shape[::-1], sitk.sitkBSpline)
+            label = resize(label, (sitk.GetArrayFromImage(image)).shape[::-1], sitk.sitkLinear)
             label_array = np.around(sitk.GetArrayFromImage(label))
             label = sitk.GetImageFromArray(label_array)
             label.SetDirection(image.GetDirection())
