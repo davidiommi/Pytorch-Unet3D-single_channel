@@ -19,17 +19,13 @@ def inference_all(model, image_list, resample, resolution, patch_size_x, patch_s
     if not os.path.isdir('./Data_folder/results'):
         os.mkdir('./Data_folder/results')
 
-    label_directory = os.path.join('./Data_folder/results', a)
-
-    if not os.path.isdir(label_directory):  # create folder
-        os.mkdir(label_directory)
+    label_directory = os.path.join(str('./Data_folder/results/results_' + a + '.nii'))
 
     result, dice = inference(False, model, image, label, './prova.nii', resample, resolution, patch_size_x,
                        patch_size_y, patch_size_z, stride_inplane, stride_layer, batch_size, segmentation=segmentation)
 
     # save segmented label
     writer = sitk.ImageFileWriter()
-    label_directory = os.path.join(label_directory, 'label_prediction.nii')
     writer.SetFileName(label_directory)
     writer.Execute(result)
     print("{}: Save evaluate label at {} success".format(datetime.datetime.now(), label_directory))
