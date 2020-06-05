@@ -142,7 +142,8 @@ def main(args):
             open(os.path.join(log_path, 'train_log.txt'), 'a').write(info_line+'\n')
 
             # save the checkpoint
-            torch.save(net.state_dict(), os.path.join(ckpt_path, "Network_{}.pth.gz".format(epoch)))
+            if epoch % 10 == 0:
+                torch.save(net.state_dict(), os.path.join(ckpt_path, "Network_{}.pth.gz".format(epoch)))
             if epoch_dice_val > best_dice:
                 best_dice = epoch_dice_val
                 torch.save(net.state_dict(), os.path.join(ckpt_path, "Best_Dice.pth.gz"))

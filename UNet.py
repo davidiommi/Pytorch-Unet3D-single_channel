@@ -1,5 +1,5 @@
 from torch.nn import Module, Sequential
-from torch.nn import Conv3d, ConvTranspose3d, BatchNorm3d, MaxPool3d, AvgPool1d
+from torch.nn import Conv3d, ConvTranspose3d, BatchNorm3d, MaxPool3d, AvgPool1d, Dropout3d
 from torch.nn import ReLU, Sigmoid
 import torch
 
@@ -12,7 +12,7 @@ class UNet(Module):
     #           4|__ __ __|4
     # The convolution operations on either side are residual subject to 1*1 Convolution for channel homogeneity
 
-    def __init__(self, num_channels=1, feat_channels=[64, 128, 256, 512, 1024], residual='conv'):
+    def __init__(self, num_channels=1, feat_channels=[64, 256, 256, 512, 1024], residual='conv'):
         # residual: conv for residual input x through 1*1 conv across every layer for downsampling, None for removal of residuals
 
         super(UNet, self).__init__()
@@ -72,9 +72,11 @@ class UNet(Module):
 
         d3 = torch.cat([self.deconv_blk3(d_high4), x3], dim=1)
         d_high3 = self.dec_conv_blk3(d3)
+        d_high3 = Dropout3d(p=0.5)(d_high3)
 
         d2 = torch.cat([self.deconv_blk2(d_high3), x2], dim=1)
         d_high2 = self.dec_conv_blk2(d2)
+        d_high2 = Dropout3d(p=0.5)(d_high2)
 
         d1 = torch.cat([self.deconv_blk1(d_high2), x1], dim=1)
         d_high1 = self.dec_conv_blk1(d1)
@@ -154,7 +156,7 @@ if __name__ == '__main__':
     torch.cuda.set_device(0)
     net =UNet(residual='pool').cuda().eval()
 
-    data = Variable(torch.randn(1, 1, 256, 256, 16)).cuda()
+    data = Variable(torch.randn(1, 1, 128, 128, 32)).cuda()
 
     out = net(data)
 

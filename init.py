@@ -15,7 +15,7 @@ class InitParser(object):
         # train setting
         self.increase_factor_data = 4                                                 # 'Increase the data number passed each epoch'
         self.resample = True                                                         # 'Decide or not to rescale the images to a new resolution'
-        self.new_resolution = (0.6, 0.6, 2.5)                                           # 'New resolution'
+        self.new_resolution = (0.6, 0.6, 2.2)   # 2.5 before                          # 'New resolution'
         self.patch_size = [128, 128, 32]                                              # "Input dimension for the Unet3D"
         self.drop_ratio = 0                                                           # "Probability to drop a cropped area if the label is empty. All empty patches will be dropped for 0 and accept all cropped patches if set to 1"
         self.min_pixel = 0.1                                                          # "Percentage of minimum non-zero pixels in the cropped label"
