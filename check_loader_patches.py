@@ -5,11 +5,10 @@ import NiftiDataset as NiftiDataset
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--data_path", type=str, default='./Data_folder/carotid/train_set/')
-parser.add_argument("--train_ratio", default=0.8)
-parser.add_argument("--resample", action='store_true', default=False, help='Decide or not to resample the images to a new resolution')
-parser.add_argument("--new_resolution", type=float, default=(0.9375, 0.9375, 3.0), help='New resolution')
-parser.add_argument("--patch_size", type=int, nargs=3, default=[128, 128, 64], help="Input dimension for the generator")
+parser.add_argument("--data_path", type=str, default='./Data_folder/train_set/')
+parser.add_argument("--resample", action='store_true', default=True, help='Decide or not to resample the images to a new resolution')
+parser.add_argument("--new_resolution", type=float, default=(0.6, 0.6, 2.5), help='New resolution')
+parser.add_argument("--patch_size", type=int, nargs=3, default=[128, 128, 32], help="Input dimension for the generator")
 parser.add_argument("--batch_size", type=int, nargs=1, default=1, help="Batch size to feed the network (currently supports 1)")
 parser.add_argument("--drop_ratio", type=float, nargs=1, default=0, help="Probability to drop a cropped area if the label is empty. All empty patches will be dropped for 0 and accept all cropped patches if set to 1")
 parser.add_argument("--min_pixel", type=int, nargs=1, default=0.1, help="Percentage of minimum non-zero pixels in the cropped label")

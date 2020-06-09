@@ -13,11 +13,11 @@ import torch.utils.data
 
 # ------- Swithes -------
 
-interpolator_image = sitk.sitkLinear                  # interpolator image
-interpolator_label = sitk.sitkNearestNeighbor                  # interpolator label
+interpolator_image = sitk.sitkLinear                 # interpolator image
+interpolator_label = sitk.sitkLinear                  # interpolator label
 
 _interpolator_image = 'linear'          # interpolator image
-_interpolator_label = 'nearest'          # interpolator label
+_interpolator_label = 'linear'          # interpolator label
 
 Segmentation = True
 
@@ -296,7 +296,7 @@ def brightness(image):
     array = array + c
 
     array[array >= max] = max
-    array[array <= 0] = min
+    array[array <= min] = min
 
     img = sitk.GetImageFromArray(np.transpose(array, axes=(2, 1, 0)))
     img.SetDirection(direction)
@@ -317,7 +317,7 @@ def contrast(image):
     IOD = np.sum(array)
     luminanza = int(IOD / ntotpixel)
 
-    c = np.random.randint(-5, 5)
+    c = np.random.randint(-20, 20)
 
     d = array - luminanza
     dc = d * abs(c) / 100
@@ -348,6 +348,23 @@ def translateit(image, offset, isseg=False):
     origin = image.GetOrigin()
 
     array = scipy.ndimage.interpolation.shift(array, (int(offset[0]), int(offset[1]), 0), order=order)
+
+    img = sitk.GetImageFromArray(np.transpose(array, axes=(2, 1, 0)))
+    img.SetDirection(direction)
+    img.SetOrigin(origin)
+    img.SetSpacing(spacing)
+
+    return img
+
+
+def imadjust(image,gamma=np.random.uniform(1, 2)):
+
+    array = np.transpose(sitk.GetArrayFromImage(image), axes=(2, 1, 0))
+    spacing = image.GetSpacing()
+    direction = image.GetDirection()
+    origin = image.GetOrigin()
+
+    array = (((array - array.min()) / (array.max() - array.min())) ** gamma) * (255 - 0) + 0
 
     img = sitk.GetImageFromArray(np.transpose(array, axes=(2, 1, 0)))
     img.SetDirection(direction)
@@ -469,6 +486,35 @@ def Normalization(image):
     image = resacleFilter.Execute(image)  # set intensity 0-255
 
     return image
+
+
+def Normalization_CT(image, x):
+    """
+    Normalize an image to 0 - 255 (8bits)
+    """
+
+    ct_array = sitk.GetArrayFromImage(image)
+
+    upper = 200 + x
+    lower = -200 + x
+
+    ct_array[ct_array > upper] = upper
+    ct_array[ct_array < lower] = lower
+
+    new_ct = sitk.GetImageFromArray(ct_array)
+    new_ct.SetDirection(image.GetDirection())
+    new_ct.SetOrigin(image.GetOrigin())
+    new_ct.SetSpacing(image.GetSpacing())
+
+    normalizeFilter = sitk.NormalizeImageFilter()
+    resacleFilter = sitk.RescaleIntensityImageFilter()
+    resacleFilter.SetOutputMaximum(255)
+    resacleFilter.SetOutputMinimum(0)
+
+    new_ct = normalizeFilter.Execute(new_ct)  # set mean and std deviation
+    new_ct = resacleFilter.Execute(new_ct)  # set intensity 0-255
+
+    return new_ct
 
 
 class StatisticalNormalization(object):
@@ -682,6 +728,32 @@ class Padding(object):
             return {'image': image, 'label': label}
 
 
+class Adapt_eq_histogram(object):
+    """
+    (Beta) Function to orient image in specific axes order
+    The elements of the order array must be an permutation of the numbers from 0 to 2.
+    """
+
+    def __init__(self):
+        self.name = 'Adapt_eq_histogram'
+
+    def __call__(self, sample):
+
+        adapt = sitk.AdaptiveHistogramEqualizationImageFilter()
+        adapt.SetAlpha(0.7)
+        adapt.SetBeta(0.8)
+        image = adapt.Execute(sample['image'])  # set mean and std deviation
+
+        resacleFilter = sitk.RescaleIntensityImageFilter()
+        resacleFilter.SetOutputMaximum(255)
+        resacleFilter.SetOutputMinimum(0)
+        image = resacleFilter.Execute(image)  # set mean and std deviation
+
+        label = sample['label']
+
+        return {'image': image, 'label': label}
+
+
 class CropBackground(object):
     """
     Crop the background of the images. Center is fixed in the centroid of the skull
@@ -838,7 +910,7 @@ class Augmentation(object):
 
     def __call__(self, sample):
 
-        choice = np.random.choice([0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11])
+        choice = np.random.choice([0, 1, 2, 4, 5, 6, 7, 8, 9, 12])
 
         # no augmentation
         if choice == 0:  # no augmentation
@@ -1006,6 +1078,15 @@ class Augmentation(object):
             label = rotation3d_label(label, theta_x, theta_y, theta_z)
 
             return {'image': image, 'label': label}
+
+        # histogram gamma
+        if choice == 12:
+            image, label = sample['image'], sample['label']
+
+            image = imadjust(image)
+
+            return {'image': image, 'label': label}
+
 
 class ConfidenceCrop(object):
     """

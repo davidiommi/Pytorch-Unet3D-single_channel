@@ -1,5 +1,5 @@
 from torch.nn import Module, Sequential
-from torch.nn import Conv3d, ConvTranspose3d, BatchNorm3d, MaxPool3d, AvgPool1d
+from torch.nn import Conv3d, ConvTranspose3d, BatchNorm3d, MaxPool3d, AvgPool1d, Dropout3d
 from torch.nn import ReLU, Sigmoid
 import torch
 
@@ -12,16 +12,16 @@ class UNet(Module):
     #           4|__ __ __|4
     # The convolution operations on either side are residual subject to 1*1 Convolution for channel homogeneity
 
-    def __init__(self, num_channels=1, feat_channels=[64, 128, 256, 512, 1024], residual='conv'):
+    def __init__(self, num_channels=1, feat_channels=[64, 256, 256, 512, 1024], residual='conv'):
         # residual: conv for residual input x through 1*1 conv across every layer for downsampling, None for removal of residuals
 
         super(UNet, self).__init__()
 
         # Encoder downsamplers
-        self.pool1 = MaxPool3d((1, 2, 2))
-        self.pool2 = MaxPool3d((1, 2, 2))
-        self.pool3 = MaxPool3d((1, 2, 2))
-        self.pool4 = MaxPool3d((1, 2, 2))
+        self.pool1 = MaxPool3d((2, 2, 2))
+        self.pool2 = MaxPool3d((2, 2, 2))
+        self.pool3 = MaxPool3d((2, 2, 2))
+        self.pool4 = MaxPool3d((2, 2, 2))
 
         # Encoder convolutions
         self.conv_blk1 = Conv3D_Block(num_channels, feat_channels[0], residual=residual)
@@ -72,9 +72,11 @@ class UNet(Module):
 
         d3 = torch.cat([self.deconv_blk3(d_high4), x3], dim=1)
         d_high3 = self.dec_conv_blk3(d3)
+        d_high3 = Dropout3d(p=0.5)(d_high3)
 
         d2 = torch.cat([self.deconv_blk2(d_high3), x2], dim=1)
         d_high2 = self.dec_conv_blk2(d2)
+        d_high2 = Dropout3d(p=0.5)(d_high2)
 
         d1 = torch.cat([self.deconv_blk1(d_high2), x1], dim=1)
         d_high1 = self.dec_conv_blk1(d1)
@@ -119,12 +121,12 @@ class Conv3D_Block(Module):
 
 class Deconv3D_Block(Module):
 
-    def __init__(self, inp_feat, out_feat, kernel=4, stride=2, padding=1):
+    def __init__(self, inp_feat, out_feat, kernel=3, stride=2, padding=1):
         super(Deconv3D_Block, self).__init__()
 
         self.deconv = Sequential(
-            ConvTranspose3d(inp_feat, out_feat, kernel_size=(1, kernel, kernel),
-                            stride=(1, stride, stride), padding=(0, padding, padding), output_padding=0, bias=True),
+            ConvTranspose3d(inp_feat, out_feat, kernel_size=(kernel, kernel, kernel),
+                            stride=(stride, stride, stride), padding=(padding, padding, padding), output_padding=1, bias=True),
             ReLU())
 
     def forward(self, x):
@@ -149,14 +151,14 @@ if __name__ == '__main__':
     import time
     import torch
     from torch.autograd import Variable
-    import torchsummary
+    from torchsummaryX import summary
 
     torch.cuda.set_device(0)
     net =UNet(residual='pool').cuda().eval()
 
-    data = Variable(torch.randn(1, 1, 64, 64, 64)).cuda()
-    start_time = time.time()
-    print("go")
-    for _ in range(500):
-        _ = net(data)
-    print((time.time() - start_time) / 500)
+    data = Variable(torch.randn(1, 1, 128, 128, 32)).cuda()
+
+    out = net(data)
+
+    summary(net,data)
+    print("out size: {}".format(out.size()))
