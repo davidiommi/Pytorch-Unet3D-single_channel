@@ -1,6 +1,8 @@
 # 3D-Unet: patched based Pytorch implementation for medical images segmentation
 
-3D-Unet pipeline is a computational toolbox for segmentation using neural networks. 
+3D-Unet pipeline is a computational toolbox for segmentation using neural networks.
+
+Same script applied for prostate segmentation can be found here: https://github.com/davidiommi/3D_Prostate_segmentation_pytorch
 
 The training and the inference are patch based: the script randomly extract corresponding patches of the images and labels and feed them to the network during training.
 The inference script extract, segment the sigle patches and automatically recontruct them in the original size.
@@ -51,26 +53,26 @@ Folder Structure:
 	.
 	├── Data_folder                   
 	|   ├── train_set              
-	|   |   ├── data_1             # Training
-	|   |   |   ├── A              # Contains domain A images 
-	|   |   |   └── B              # Contains domain B labels 
-	|   |   └── data_2             
-	|   |   |   ├── A              
-	|   |   |   └── B              
+	|   |   ├── patient_1             # Training
+	|   |   |   ├── image             # Contains domain image 
+	|   |   |   └── label             # Contains domain label 
+	|   |   └── patient_2             
+	|   |   |   ├── image              
+	|   |   |   └── label              
 	|   ├── test_set               
-	|   |   ├── data_1             # Testing
-	|   |   |   ├── A              
-	|   |   |   └── B              
-	|   |   └── data_2             
-	|   |   |   ├── A              
-	|   |   |   └── B              
+	|   |   ├── patient_3             # Testing
+	|   |   |   ├── image              
+	|   |   |   └── label              
+	|   |   └── patient_4             
+	|   |   |   ├── image              
+	|   |   |   └── label              
 	|   ├── validation_set               
-	|   |   ├── data_1             # Validation
-	|   |   |   ├── A             
-	|   |   |   └── B              
-	|   |   └── data_2             
-	|   |   |   ├── A              
-	|   |   |   └── B              
+	|   |   ├── patient_5              # Validation
+	|   |   |   ├── image             
+	|   |   |   └── label              
+	|   |   └── patient_6             
+	|   |   |   ├── image              
+	|   |   |   └── label              
 
 ## Features
 - 3D data processing ready
