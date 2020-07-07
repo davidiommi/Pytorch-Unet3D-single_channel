@@ -31,7 +31,9 @@ visdom>=0.1.8.
 
 ### Python scripts and their function
 
-- NiftiDataset.py : They augment the data, extract the patches and feed them to the GAN (reads .nii files). NiftiDataset.py
+- organize_folder_structure.py: Organize the data in the folder structure for the network
+
+- NiftiDataset.py : They augment the data, extract the patches and feed them to the network (reads .nii files). NiftiDataset.py
   skeleton taken from https://github.com/jackyko1991/unet3d-pytorch
 
 - check_loader_patches: Shows example of patches fed to the network during the training  
@@ -47,7 +49,9 @@ visdom>=0.1.8.
 - predict_single_image.py: It launches the inference on a single input image chosen by the user.
 
 ## Usage
+Use first organize_folder_structure.py to create organize the data in the following folder structure
 Modify the init.py to set the parameters and start the training/testing on the data:
+
 Folder Structure:
 
 	.
