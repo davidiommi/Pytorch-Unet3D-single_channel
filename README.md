@@ -36,7 +36,7 @@ visdom>=0.1.8.
 
 - check_loader_patches: Shows example of patches fed to the network during the training  
 
-- unet3d.py: the architecture of the U-net.
+- UNet.py: the architecture of the U-net.
 
 - utils.py : list of metrics and loss functions for the training
 
