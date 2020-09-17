@@ -1,7 +1,7 @@
 # 3D-Unet: patched based Pytorch implementation for medical images segmentation
 
 *******************************************************************************
-### Update
+### Important News -- Repository Maintenance 
 
 This repository will no longer be developed and improved. A new version for medical images segmentation is available at https://github.com/davidiommi/SALMON 
 *******************************************************************************
