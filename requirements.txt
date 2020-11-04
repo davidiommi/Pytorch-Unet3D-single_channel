@@ -1,6 +1,6 @@
 pillow
 scikit-learn
-simpleITK
+simpleITK==1.2.4
 keras
 scikit-image
 pandas
