@@ -1,5 +1,11 @@
 # 3D-Unet: patched based Pytorch implementation for medical images segmentation
 
+*******************************************************************************
+### Important News -- Repository Maintenance 
+
+This repository will no longer be developed and improved. A new version for medical images segmentation is available at https://github.com/davidiommi/SALMON 
+*******************************************************************************
+
 3D-Unet pipeline is a computational toolbox for segmentation using neural networks.
 
 Same script applied for prostate segmentation can be found here: https://github.com/davidiommi/3D_Prostate_segmentation_pytorch
